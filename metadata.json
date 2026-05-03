@@ -1,0 +1,6 @@
+{
+  "name": "Song Guessing Game",
+  "description": "A Guess the Song pop culture trivia game built with React and Tailwind using the iTunes API.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
