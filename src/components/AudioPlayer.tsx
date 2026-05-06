@@ -150,7 +150,7 @@ export function AudioPlayer({ url, autoPlay = true, forcePause = false }: AudioP
           onPause={() => setIsPlaying(false)}
           onPlay={() => setIsPlaying(true)}
           onEnded={() => setIsPlaying(false)}
-          onError={(e) => {
+          onError={() => {
             // Silently handle expected format errors or cross-origin playback issues
             setIsReady(true);
           }}
