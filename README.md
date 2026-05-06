@@ -1,6 +1,11 @@
 # 🎵 Song Guesser - Deezer Edition
 
-![Song Guesser Preview](public/song-guesser.png) <!-- Add a screenshot to the public folder and link it here -->
+<p align="center">
+  <img src="public/SG.png" width="200"/>
+  <img src="public/SG1.png" width="200"/>
+  <img src="public/SG2.png" width="200"/>
+  <img src="public/SG3.png" width="200"/>
+</p>
 
 A modernized, fully responsive Song Guessing game built with React, TypeScript, and Tailwind CSS. Test your musical knowledge across 11 different genres powered by the Deezer API.
 
