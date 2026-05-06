@@ -1,6 +1,6 @@
 {
-  "name": "Song Guessing Game",
-  "description": "A Guess the Song pop culture trivia game built with React and Tailwind using the iTunes API.",
+  "name": "Song Guesser - Deezer Edition",
+  "description": "A modernized, fully responsive Song Guessing game built with React, Typescript, and Tailwind CSS. Features 11 different genres powered by the Deezer API.",
   "requestFramePermissions": [],
   "majorCapabilities": []
 }

@@ -17,7 +17,7 @@ describe('math utilities', () => {
     });
 
     it('works with empty arrays', () => {
-      const original: any[] = [];
+      const original: number[] = [];
       expect(shuffleArray(original)).toEqual([]);
     });
 

@@ -18,7 +18,7 @@ export function useSoundEffects() {
       osc.start();
       osc.stop(ctx.currentTime + 0.5);
     } catch (e) {
-      console.error(e);
+      console.error(e instanceof Error ? e.message : String(e));
     }
   }, []);
 
@@ -39,7 +39,7 @@ export function useSoundEffects() {
       osc.start();
       osc.stop(ctx.currentTime + 0.3);
     } catch (e) {
-      console.error(e);
+      console.error(e instanceof Error ? e.message : String(e));
     }
   }, []);
 

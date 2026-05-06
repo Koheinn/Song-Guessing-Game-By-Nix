@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Song, QuestionType, GameStatus } from '../types';
+import { Song, QuestionType, GameStatus, GameMode } from '../types';
 import { fetchSongs } from '../services/musicService';
 import { shuffleArray } from '../utils/math';
 
@@ -13,17 +13,28 @@ export function useGame() {
   const [score, setScore] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
-  const startGame = useCallback(async () => {
+  const [mode, setMode] = useState<GameMode>('pop');
+
+  const startGame = useCallback(async (selectedMode?: GameMode) => {
     try {
       setError(null);
       setStatus('loading');
+      
+      const gameMode = selectedMode || mode;
+      
+      // If changing mode, we should fetch new pool
+      const isNewMode = selectedMode && selectedMode !== mode;
+      if (isNewMode) {
+        setMode(selectedMode);
+      }
+      
       let currentPool = pool;
       
-      // Fetch songs if pool is empty or too small
-      if (currentPool.length < QUESTIONS_PER_GAME + 10) {
-        const fetched = await fetchSongs();
+      // Fetch songs if pool is empty or too small, or if mode changed
+      if (currentPool.length < QUESTIONS_PER_GAME + 10 || isNewMode) {
+        const fetched = await fetchSongs(gameMode);
         if (fetched.length < QUESTIONS_PER_GAME) {
-           throw new Error("Not enough songs found to play.");
+           throw new Error("Not enough songs found to play in this mode.");
         }
         currentPool = fetched;
         setPool(fetched);
@@ -54,7 +65,7 @@ export function useGame() {
       setError(err instanceof Error ? err.message : "Error starting game. Please try again.");
       setStatus('start');
     }
-  }, [pool]);
+  }, [pool, mode]);
 
   const answerQuestion = useCallback((isCorrect: boolean) => {
     if (isCorrect) {
@@ -79,6 +90,7 @@ export function useGame() {
     currentIndex,
     score,
     error,
+    mode,
     startGame,
     answerQuestion,
     resetGame,

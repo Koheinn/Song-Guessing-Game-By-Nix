@@ -11,8 +11,10 @@ export default function App() {
     currentIndex,
     score,
     error,
+    mode,
     startGame,
     answerQuestion,
+    resetGame,
     totalQuestions
   } = useGame();
 
@@ -32,7 +34,7 @@ export default function App() {
           </div>
         )}
 
-        {status === "start" && <StartScreen onStart={startGame} />}
+        {status === "start" && <StartScreen onStart={(mode) => startGame(mode)} />}
         
         {status === "loading" && (
           <div className="flex flex-col items-center justify-center flex-1 gap-4">
@@ -48,6 +50,7 @@ export default function App() {
             totalQuestions={totalQuestions}
             score={score}
             onAnswer={answerQuestion}
+            onEndGame={resetGame}
           />
         )}
 
@@ -55,7 +58,8 @@ export default function App() {
           <GameOverScreen
             score={score}
             totalQuestions={totalQuestions}
-            onRestart={startGame}
+            mode={mode}
+            onRestart={resetGame}
           />
         )}
       </div>

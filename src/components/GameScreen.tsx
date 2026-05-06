@@ -10,6 +10,7 @@ interface GameScreenProps {
   totalQuestions: number;
   score: number;
   onAnswer: (isCorrect: boolean) => void;
+  onEndGame: () => void;
 }
 
 export function GameScreen({
@@ -18,15 +19,19 @@ export function GameScreen({
   totalQuestions,
   score,
   onAnswer,
+  onEndGame,
 }: GameScreenProps) {
+
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [isRevealed, setIsRevealed] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const { playCorrect, playWrong } = useSoundEffects();
 
   // Reset state when question changes
   useEffect(() => {
     setSelectedOptionId(null);
     setIsRevealed(false);
+    setIsTransitioning(false);
   }, [question]);
 
   const handleOptionClick = (option: Song) => {
@@ -42,21 +47,17 @@ export function GameScreen({
       playWrong();
     }
     
-    // Wait a couple seconds before advancing
+    // Wait before advancing
     setTimeout(() => {
-      onAnswer(isCorrect);
-    }, 2500);
+      setIsTransitioning(true);
+      setTimeout(() => {
+        onAnswer(isCorrect);
+      }, 100);
+    }, 2400);
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.5 }}
-      key={currentQuestionIndex} // Re-animate on question change
-      className="w-full flex-1 flex flex-col"
-    >
+    <div className="w-full flex-1 flex flex-col">
       {/* Top Navigation / Stats Bar */}
       <nav className="relative z-10 flex justify-between items-center mb-8 sm:mb-12">
         <div className="flex items-center gap-3">
@@ -66,6 +67,13 @@ export function GameScreen({
             </svg>
           </div>
           <span className="text-xl font-bold tracking-tight uppercase hidden sm:block">SongGuesser</span>
+          
+          <button 
+            onClick={onEndGame}
+            className="ml-4 px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-red-400 bg-red-400/10 hover:bg-red-400/20 border border-red-400/20 rounded-lg transition-colors"
+          >
+            End Game
+          </button>
         </div>
         
         <div className="flex items-center gap-4 sm:gap-8">
@@ -83,8 +91,13 @@ export function GameScreen({
         </div>
       </nav>
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col items-center justify-center pb-8 lg:pb-12 px-4 sm:px-0">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.5 }}
+        className="flex-1 flex flex-col items-center justify-center pb-8 lg:pb-12 px-4 sm:px-0"
+      >
         
         {/* Album/Visualizer Glass Card */}
         <div className="w-full max-w-2xl bg-white/5 backdrop-blur-xl border border-white/10 rounded-[32px] p-6 sm:p-8 mb-10 shadow-2xl relative">
@@ -94,11 +107,23 @@ export function GameScreen({
               <div className={`w-full h-full transition-all duration-700 preserve-3d ${isRevealed ? 'rotate-y-180' : ''}`}>
                 
                 {/* Front of card (Vinyl Placeholder) */}
-                <div className="absolute inset-0 backface-hidden bg-neutral-900 rounded-full flex items-center justify-center border-4 border-white/5 shadow-inner overflow-hidden">
-                  <div className="w-16 h-16 rounded-full bg-neutral-800 border-2 border-white/10 z-10"></div>
+                <div className="absolute inset-0 backface-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-black rounded-full flex flex-col items-center justify-center border-4 border-white/10 shadow-[inset_0_0_50px_rgba(0,0,0,0.8)] overflow-hidden">
+                  {/* Decorative glowing orb */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-blue-500/20 rounded-full blur-[40px] mix-blend-screen" />
+                  
+                  {/* Music Icon */}
+                  <svg className="w-16 h-16 text-white/50 z-10 drop-shadow-2xl" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                  </svg>
+                  
+                  <div className="mt-4 z-10 text-xs font-mono tracking-widest text-white/40 uppercase">Guess the track</div>
+
+                  {/* Subtle rings */}
+                  <div className="absolute inset-4 rounded-full border border-white/5" />
+                  <div className="absolute inset-10 rounded-full border border-white/5" />
+                  
                   {/* Spinning effect inside */}
-                  <div className="absolute inset-4 rounded-full border border-blue-500/30 animate-[spin_4s_linear_infinite]" />
-                  <div className="absolute inset-10 rounded-full border border-purple-500/20 animate-[spin_3s_linear_infinite_reverse]" />
+                  <div className="absolute inset-0 bg-[conic-gradient(from_0deg,transparent_0_340deg,rgba(255,255,255,0.1)_360deg)] animate-[spin_4s_linear_infinite]" />
                 </div>
 
                 {/* Back of card (Revealed Cover Art) */}
@@ -120,7 +145,11 @@ export function GameScreen({
               <h1 className="text-3xl sm:text-4xl font-bold mb-6">Which song is this?</h1>
               
               {/* Audio Player */}
-              <AudioPlayer url={question.correctSong.previewUrl} autoPlay={true} />
+              <AudioPlayer 
+                url={question.correctSong.previewUrl} 
+                autoPlay={true} 
+                forcePause={isTransitioning}
+              />
             </div>
           </div>
         </div>
@@ -184,7 +213,7 @@ export function GameScreen({
             );
           })}
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }
