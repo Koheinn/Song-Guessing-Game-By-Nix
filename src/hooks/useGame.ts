@@ -61,7 +61,7 @@ export function useGame() {
       setScore(0);
       setStatus('playing');
     } catch (err: unknown) {
-      console.error(err);
+      console.error("Game Error: " + (err instanceof Error ? err.message : String(err)));
       setError(err instanceof Error ? err.message : "Error starting game. Please try again.");
       setStatus('start');
     }

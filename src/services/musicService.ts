@@ -20,7 +20,7 @@ export const fetchSongs = async (mode: GameMode): Promise<Song[]> => {
       };
     });
   } catch (error) {
-    console.error("Error fetching songs from API", error);
+    console.error("Error fetching songs from API: " + (error instanceof Error ? error.message : String(error)));
     throw new Error("Could not load music data. Please check your connection.");
   }
 };

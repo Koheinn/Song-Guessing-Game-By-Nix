@@ -26,8 +26,8 @@ export function AudioPlayer({ url, autoPlay = true, forcePause = false }: AudioP
   // AutoPlay logic
   useEffect(() => {
     if (autoPlay && isReady && !forcePause) {
-      audioRef.current?.play().catch(e => {
-        console.log("Autoplay prevented or interrupted:", e.message || String(e));
+      audioRef.current?.play().catch(() => {
+        // Silently handle autoplay prevention
       });
     }
   }, [autoPlay, isReady, url, forcePause]);
@@ -43,7 +43,9 @@ export function AudioPlayer({ url, autoPlay = true, forcePause = false }: AudioP
       if (isPlaying) {
         audioRef.current.pause();
       } else {
-        audioRef.current.play().catch(e => console.log(e.message || String(e)));
+        audioRef.current.play().catch(() => {
+          // Silently handle expected playback interruptions
+        });
       }
     }
   };
@@ -139,21 +141,23 @@ export function AudioPlayer({ url, autoPlay = true, forcePause = false }: AudioP
         </div>
       </div>
 
-      <audio
-        ref={audioRef}
-        src={url}
-        onCanPlay={() => setIsReady(true)}
-        onTimeUpdate={handleTimeUpdate}
-        onPause={() => setIsPlaying(false)}
-        onPlay={() => setIsPlaying(true)}
-        onEnded={() => setIsPlaying(false)}
-        onError={(e) => {
-          console.error("Audio Error:", e.currentTarget.error?.message || "Unknown error");
-          setIsReady(true);
-        }}
-        preload="auto"
-        className="hidden"
-      />
+      {url && (
+        <audio
+          ref={audioRef}
+          src={url}
+          onCanPlay={() => setIsReady(true)}
+          onTimeUpdate={handleTimeUpdate}
+          onPause={() => setIsPlaying(false)}
+          onPlay={() => setIsPlaying(true)}
+          onEnded={() => setIsPlaying(false)}
+          onError={(e) => {
+            // Silently handle expected format errors or cross-origin playback issues
+            setIsReady(true);
+          }}
+          preload="auto"
+          className="hidden"
+        />
+      )}
     </div>
   );
 }
